@@ -138,6 +138,12 @@ const TicketPurchaseForm = ({ event, onClose }: TicketPurchaseFormProps) => {
             <div className="text-gray-600">
               <p className="font-medium">{event.eventName}</p>
               <p>{event.eventLocation}</p>
+             <p>
+              {new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              }).format(new Date(event.eventDateAndTime))}
+            </p>
               {event.eventDescription && (
                 <p className="text-sm mt-1 text-gray-500">{event.eventDescription}</p>
               )}
@@ -162,7 +168,7 @@ const TicketPurchaseForm = ({ event, onClose }: TicketPurchaseFormProps) => {
                           ticket.selected ? 'bg-gray-400 border-gray-400' : 'border-gray-300'
                         }`} />
                         <span className="text-gray-700">
-                          {ticket.name} - ${event.ticketPrices}
+                          {ticket.name} - ${event.ticketPrices} 
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
