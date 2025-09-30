@@ -46,10 +46,10 @@ const TicketPurchaseForm = ({ event, onClose }: TicketPurchaseFormProps) => {
     setIsLoading(true);
 
      const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+    process.env.NEXT_PUBLIC_API_URL;
     
     try {
-      const response = await fetch(`${API_BASE_URL}/ticket/`, {
+      const response = await fetch(`${API_BASE_URL}/ticket`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
