@@ -21,13 +21,16 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
   useEffect(() => {
     if (!isOpen) return;
 
     const fetchUser = async () => {
       try {
         setLoading(true);
-        const res = await fetch('http://localhost:8080/auth/google/me', {
+        const res = await fetch(`${API_BASE_URL}/auth/google/me`, {
           method: 'GET',
           credentials: 'include',
         });
