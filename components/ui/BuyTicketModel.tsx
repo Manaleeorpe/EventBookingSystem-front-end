@@ -96,6 +96,7 @@ const TicketPurchaseForm = ({ event, onClose }: TicketPurchaseFormProps) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({
         userId: user?.id, // You may want to get this from user context/auth
         eventId: event.id,
