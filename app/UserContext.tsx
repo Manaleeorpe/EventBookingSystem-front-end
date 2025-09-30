@@ -35,12 +35,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+   const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
   // 3) Fetch current user once (and on refresh)
   const fetchMe = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch('http://localhost:8080/auth/google/me', {
+      const res = await fetch(`${API_BASE_URL}/auth/google/me`, {
         credentials: 'include',
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Event } from '@/lib/types';
 
+import { useUser } from '@/app/UserContext';
+
 interface TicketType {
   id: string;
   name: string;
@@ -17,6 +19,10 @@ interface TicketPurchaseFormProps {
 }
 
 const TicketPurchaseForm = ({ event, onClose }: TicketPurchaseFormProps) => {
+
+   const { user, setUser, loading } = useUser();
+    const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL;
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([
     { id: 'general', name: 'General Admission', price: 75, selected: true, quantity: 1 },
   ]);
@@ -42,11 +48,12 @@ const TicketPurchaseForm = ({ event, onClose }: TicketPurchaseFormProps) => {
     return ticketTotal;
   };
 
+
+
   const purchaseTicket = async () => {
     setIsLoading(true);
 
-     const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL;
+   
     
     try {
       const response = await fetch(`${API_BASE_URL}/ticket`, {
@@ -55,7 +62,7 @@ const TicketPurchaseForm = ({ event, onClose }: TicketPurchaseFormProps) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: 4, // You may want to get this from user context/auth
+          userId: user?.id, // You may want to get this from user context/auth
           eventId: event.id,
           price: calculateTotal()
         })
@@ -84,13 +91,13 @@ const TicketPurchaseForm = ({ event, onClose }: TicketPurchaseFormProps) => {
      setIsLoading(true);
   
   try {
-    const response = await fetch('http://localhost:8080/ticket', {
+    const response = await fetch(`${API_BASE_URL}/ticket`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        userId: 4, // You may want to get this from user context/auth
+        userId: user?.id, // You may want to get this from user context/auth
         eventId: event.id,
         price: calculateTotal()
       })
