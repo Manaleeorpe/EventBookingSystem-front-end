@@ -9,6 +9,7 @@ interface AddEventModalProps {
   onSubmit: (eventData: any) => void;
 }
 
+
 /**
  * Assumptions (adjust to match your backend DTO exactly):
  * - availableSeats: int
@@ -36,6 +37,9 @@ export default function AddEventModal({
     eventTime: '10:00 AM',
   });
 
+   const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (
@@ -112,7 +116,7 @@ export default function AddEventModal({
         eventDateAndTime, // ISO string with Z
       };
 
-      const response = await fetch('http://localhost:8080/events', {
+      const response = await fetch(`${API_BASE_URL}/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
