@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { CldUploadWidget } from 'next-cloudinary';
+import { PhotoIcon } from '@heroicons/react/24/solid';
 
 interface AddEventModalProps {
   isOpen: boolean;
@@ -41,6 +43,30 @@ export default function AddEventModal({
     process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [eventImage, setEventImage] = useState<File | null>(null);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+    const [cloudinaryPublicId, setCloudinaryPublicId] = useState<string | null>(null);
+
+    // UI-only: handle file selection and preview (no upload)
+    const handleImageSelect: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setEventImage(file);
+      const url = URL.createObjectURL(file);
+      setImagePreviewUrl(url);
+    };
+
+    const removeImage = () => {
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+      setEventImage(null);
+      setImagePreviewUrl(null);
+    };
+
+
+
+
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -53,6 +79,8 @@ export default function AddEventModal({
       [name]: value,
     }));
   };
+
+  
 
   // Convert "hh:mm AM/PM" to "HH:mm" 24-hour string
   const convertTo24Hour = (time12h: string) => {
@@ -103,6 +131,8 @@ export default function AddEventModal({
       const localDate = new Date(year, month - 1, day, hh, mm, 0, 0);
       const eventDateAndTime = localDate.toISOString(); // e.g., "2025-01-20T14:30:00.000Z"
 
+      const ImageUrl = imagePreviewUrl
+
       // Payload: adjust keys to exactly what your backend expects.
       const payload = {
         eventName: formData.eventName,
@@ -113,7 +143,7 @@ export default function AddEventModal({
         ticketPrices, // float
         EventDuration, // int (rename to EventDuration if required)
         EventCategory: formData.EventCategory, // string (rename to EventCategory if required)
-        eventDateAndTime, // ISO string with Z
+        eventDateAndTime,imageUrl: ImageUrl // ISO string with Z
       };
 
       const response = await fetch(`${API_BASE_URL}/events`, {
@@ -171,6 +201,7 @@ export default function AddEventModal({
       eventDate: '',
       eventTime: '10:00 AM',
     });
+    setImagePreviewUrl(null);
     onClose();
   };
 
@@ -224,6 +255,99 @@ export default function AddEventModal({
               required
             />
           </div>
+
+          {!imagePreviewUrl ? (
+    <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-300 px-6 py-10">
+      <div className="text-center">
+        <PhotoIcon className="mx-auto h-12 w-12 text-gray-300" />
+        <div className="mt-4 flex text-sm text-gray-600 items-center justify-center gap-2">
+          <CldUploadWidget
+            uploadPreset="next_cloudinary_upload"
+            options={{
+              multiple: false,
+              maxFiles: 1,
+              cropping: false,
+              sources: ['local', 'url', 'camera', 'google_drive'],
+              folder: 'events', // optional
+              resourceType: 'image',
+            }}
+             onSuccess={(result: any) => {
+            const info = (result as any).info; // widget returns { event, info }
+               if (info?.secure_url) setImagePreviewUrl(info.secure_url as string);
+               console.log(info.secure_url as string)
+            if (info?.public_id) setCloudinaryPublicId(info.public_id as string);
+          }}
+            onQueuesEnd={() => {
+              // Optional: called when all uploads in the queue finish
+            }}
+          >
+           {({ open }) => (
+          <button
+            type="button"
+            onClick={() => open()}
+            className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          >
+            Upload with Cloudinary
+          </button>
+        )}
+          </CldUploadWidget>
+        </div>
+        <p className="mt-2 text-xs text-gray-500">
+          PNG, JPG, WEBP, GIF up to your preset limits
+        </p>
+      </div>
+    </div>
+  ) : (
+    <div className="mt-2 flex items-start gap-4">
+      <img
+        src={imagePreviewUrl}
+        alt="Event preview"
+        className="h-28 w-28 rounded-md object-cover border"
+      />
+      <div className="flex flex-col gap-2">
+        <div className="text-xs text-gray-600 break-all">
+          {cloudinaryPublicId}
+        </div>
+        <div className="flex gap-2">
+          <CldUploadWidget
+            uploadPreset="next_cloudinary_upload"
+            options={{ multiple: false, maxFiles: 1, folder: 'events' }}
+             onSuccess={(result: any) => {
+   // Defensive parse: some versions provide { event: 'success', info }
+        const info =
+          result?.info ??
+          (Array.isArray(result) ? result[0]?.info : undefined);
+        const url = info?.secure_url || info?.url || null;
+        if (url) setImagePreviewUrl(url);
+        if (info?.public_id) setCloudinaryPublicId(info.public_id);
+      }}
+        >
+            {({ open }) => (
+              <button
+                type="button"
+                onClick={() => open()}
+                className="px-3 py-1.5 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Change
+              </button>
+            )}
+          </CldUploadWidget>
+
+          <button
+            type="button"
+            onClick={() => {
+              setImagePreviewUrl(null);
+              setCloudinaryPublicId(null);
+            }}
+            className="px-3 py-1.5 rounded-md text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+
 
           {/* Event Location */}
           <div>

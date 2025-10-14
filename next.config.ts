@@ -22,6 +22,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'cdn.iconscout.com',
       },
+       {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
     ],
   },
   eslint: { ignoreDuringBuilds: true },
