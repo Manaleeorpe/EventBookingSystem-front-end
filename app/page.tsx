@@ -15,7 +15,7 @@ export default function Home() {
       className="flex items-center justify-center h-screen bg-cover bg-center relative"
       style={{
         backgroundImage:
-          "url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1800&q=80')",
+          "url('https://res.cloudinary.com/dyskenchr/image/upload/v1766423924/events/krvyssurhhmcuj1rihj5.jpg')",
       }}
     >
       {/* Overlay */}
@@ -24,7 +24,7 @@ export default function Home() {
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-sm bg-white rounded-xl shadow-lg p-8 text-center">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          Chat Application
+          Event Management Application
         </h1>
         <p className="text-gray-600 mb-6">
           Sign in with your Google Account
